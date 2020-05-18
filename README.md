@@ -7,8 +7,6 @@ You can bring this up by doing `grterm --help`.
 Usage:
   -command string
     	Command to execute as shell (default "<YOUR_LOGIN_SHELL>")
-  -nocolor
-    	Disable message colors
   -output string
     	Save path of recording (default "rec.ttyrec")
 ```

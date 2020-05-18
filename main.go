@@ -10,15 +10,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/logrusorgru/aurora"
+	"github.com/TwinProduction/go-color"
 	"github.com/rebeccajae/grterm/pkg/ttyrec"
 	"github.com/riywo/loginshell"
 
 	"github.com/creack/pty"
 	"golang.org/x/crypto/ssh/terminal"
 )
-
-var au aurora.Aurora
 
 func term(cmd, out string) error {
 	rec, err := ttyrec.NewTTYRecorder(out)
@@ -32,7 +30,7 @@ func term(cmd, out string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(au.Sprintf(au.Green("Recording %s to %s"), cmd, out))
+	fmt.Println(color.Ize(color.Green, fmt.Sprintf("Recording %s to %s", cmd, out)))
 	defer func() {
 		_ = ptmx.Close()
 	}()
@@ -73,14 +71,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	disableColors := flag.Bool("nocolor", false, "Disable message colors")
 	cmd := flag.String("command", shell, "Command to execute as shell")
 	output := flag.String("output", "rec.ttyrec", "Save path of recording")
 	flag.Parse()
 
-	au = aurora.NewAurora(!*disableColors)
 	if err := term(*cmd, *output); err != nil {
-		fmt.Println(au.Sprintf(au.Red("Error recording: %s"), err))
+		fmt.Println(color.Ize(color.Red, fmt.Sprintf("Error recording: %s", err)))
 	}
-	fmt.Println(au.Sprintf(au.Green("Finished recording %s to %s"), *cmd, *output))
+	fmt.Println(color.Ize(color.Green, fmt.Sprintf("Finished recording %s to %s", *cmd, *output)))
 }
