@@ -18,6 +18,8 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+var disableResize bool
+
 func term(cmd, out string) error {
 	rec, err := ttyrec.NewTTYRecorder(out)
 	if err != nil {
@@ -41,6 +43,14 @@ func term(cmd, out string) error {
 		for range ch {
 			if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
 				log.Printf("error resizing pty: %s", err)
+			}
+			if !disableResize {
+				y, x, err := pty.Getsize(ptmx)
+				if err != nil {
+					log.Printf("error resizing recorded pty: %s", err)
+				}
+				code := fmt.Sprintf("\x1b[8;%d;%dt", y, x)
+				rec.Write([]byte(code))
 			}
 		}
 	}()
@@ -73,6 +83,7 @@ func main() {
 
 	cmd := flag.String("command", shell, "Command to execute as shell")
 	output := flag.String("output", "rec.ttyrec", "Save path of recording")
+	flag.BoolVar(&disableResize, "noresize", false, "Disables insertion of resize escape codes")
 	flag.Parse()
 
 	if err := term(*cmd, *output); err != nil {
