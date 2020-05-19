@@ -18,10 +18,6 @@ Usage:
 go get github.com/rebeccajae/grterm
 ```
 
-## Reusable Bits
-`pkg/ttyrec` implements a writer that is compatible with the ttyrec format.
-I use a pty library and just multiwrite to a ttyrec writer.
-
 ## Resizability
 Some terminal emulators allow you to configure escape-code driven resizes. 
 The specific configuration for your terminal emulator may vary.
@@ -33,3 +29,11 @@ Profile > Terminal > Disable session-initiated window resizing
 
 Note that not all terminal emulators know what to do with this, so
 be careful. You can disable inserting them by using the `--noresize` flag.
+
+If a terminal emulator is not compatible with these, it may render the escape
+sequence. I know iTerm works, and there's no reason xterm wouldn't either, but
+YMMV.
+
+## Reusable Bits
+`pkg/ttyrec` implements a writer that is compatible with the ttyrec format.
+I use a pty library and just multiwrite to a ttyrec writer.
