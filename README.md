@@ -14,9 +14,7 @@ Usage:
 ```
 
 ## Installation 
-```
-go get github.com/rebeccajae/grterm
-```
+TODO
 
 ## Resizability
 Some terminal emulators allow you to configure escape-code driven resizes. 
