@@ -25,7 +25,10 @@ func TestTTYRecWriter(t *testing.T) {
 	rec := NewTTYRecorder(&bwc)
 	ts := time.Now()
 	before := NanosToTimeval(ts.UnixNano())
-	rec.Write(testBytes)
+	_, err := rec.Write(testBytes)
+	if err != nil {
+		t.Fatal(err)
+	}
 	ts = time.Now()
 	after := NanosToTimeval(ts.UnixNano())
 	res := bwc.Bytes()
