@@ -45,11 +45,11 @@ func (tr *TTYRecorder) writeBytes(data []byte) (int, error) {
 	binary.LittleEndian.PutUint32(headerBuff[4:8], uint32(timeval.Usec))
 	binary.LittleEndian.PutUint32(headerBuff[8:12], uint32(writeLen))
 	writeData := append(headerBuff, data...)
-	bw, err := tr.wr.Write(writeData)
+	_, err := tr.wr.Write(writeData)
 	if err != nil {
 		return -1, err
 	}
-	return bw, nil
+	return len(data), nil
 }
 
 func (tr *TTYRecorder) Write(data []byte) (int, error) {

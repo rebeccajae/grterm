@@ -20,13 +20,7 @@ import (
 
 var disableResize bool
 
-func term(cmd, out string) error {
-	f, err := os.Create(out)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
+func term(cmd string, f io.Writer) error {
 	rec := ttyrec.NewTTYRecorder(f)
 
 	c := exec.Command(cmd)
@@ -34,7 +28,7 @@ func term(cmd, out string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(color.Ize(color.Green, fmt.Sprintf("Recording %s to %s", cmd, out)))
+	fmt.Println(color.Ize(color.Green, fmt.Sprintf("Recording %s", cmd)))
 	defer func() {
 		_ = ptmx.Close()
 	}()
@@ -60,7 +54,7 @@ func term(cmd, out string) error {
 
 	oldState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	defer func() {
@@ -72,9 +66,9 @@ func term(cmd, out string) error {
 	}()
 
 	stdoutw := io.MultiWriter(os.Stdout, rec)
-	_, _ = io.Copy(stdoutw, ptmx)
+	_, err = io.Copy(stdoutw, ptmx)
 
-	return nil
+	return err
 }
 
 func main() {
@@ -88,7 +82,14 @@ func main() {
 	flag.BoolVar(&disableResize, "noresize", false, "Disables insertion of resize escape codes")
 	flag.Parse()
 
-	if err := term(*cmd, *output); err != nil {
+	f, err := os.Create(*output)
+	if err != nil {
+		fmt.Println(color.Ize(color.Red, fmt.Sprintf("Error recording: %s", err)))
+	}
+	defer f.Close()
+	fmt.Println(color.Ize(color.Green, fmt.Sprintf("Recording to %s", *output)))
+
+	if err := term(*cmd, f); err != nil {
 		fmt.Println(color.Ize(color.Red, fmt.Sprintf("Error recording: %s", err)))
 	}
 	fmt.Println(color.Ize(color.Green, fmt.Sprintf("Finished recording %s to %s", *cmd, *output)))
