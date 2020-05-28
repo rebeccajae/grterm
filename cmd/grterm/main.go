@@ -21,11 +21,13 @@ import (
 var disableResize bool
 
 func term(cmd, out string) error {
-	rec, err := ttyrec.NewTTYRecorder(out)
+	f, err := os.Create(out)
 	if err != nil {
 		return err
 	}
-	defer rec.Close()
+	defer f.Close()
+
+	rec := ttyrec.NewTTYRecorder(f)
 
 	c := exec.Command(cmd)
 	ptmx, err := pty.Start(c)

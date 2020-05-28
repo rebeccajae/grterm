@@ -2,16 +2,18 @@ package ttyrec
 
 import (
 	"encoding/binary"
-	"os"
+	"io"
 	"sync"
 	"time"
 )
 
+// TTYRecorder is a wrapper around a Writer that implements ttyrec formatting
 type TTYRecorder struct {
-	wr  *os.File
+	wr  io.Writer
 	mux sync.Mutex
 }
 
+// Timeval is a struct compatible with what is normally returned by NsecToTimeval
 type Timeval struct {
 	Sec  int32
 	Usec int32
@@ -26,19 +28,12 @@ func NanosToTimeval(ns int64) *Timeval {
 	}
 }
 
-func NewTTYRecorder(fp string) (*TTYRecorder, error) {
-	f, err := os.Create(fp)
-	if err != nil {
-		return nil, err
-	}
+// NewTTYRecorder instantiates a TTYRecorder wrapped around the writer w
+func NewTTYRecorder(w io.Writer) *TTYRecorder {
 	tr := &TTYRecorder{
-		wr: f,
+		wr: w,
 	}
-	return tr, nil
-}
-
-func (tr *TTYRecorder) Close() error {
-	return tr.wr.Close()
+	return tr
 }
 
 func (tr *TTYRecorder) writeBytes(data []byte) (int, error) {
