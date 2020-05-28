@@ -40,19 +40,12 @@ func (tr *TTYRecorder) writeBytes(data []byte) (int, error) {
 	t := time.Now()
 	timeval := NanosToTimeval(t.UnixNano())
 	writeLen := len(data)
-	err := binary.Write(tr.wr, binary.LittleEndian, timeval.Sec)
-	if err != nil {
-		return -1, err
-	}
-	err = binary.Write(tr.wr, binary.LittleEndian, timeval.Usec)
-	if err != nil {
-		return -1, err
-	}
-	err = binary.Write(tr.wr, binary.LittleEndian, int32(writeLen))
-	if err != nil {
-		return -1, err
-	}
-	bw, err := tr.wr.Write(data)
+	headerBuff := make([]byte, 12)
+	binary.LittleEndian.PutUint32(headerBuff[0:4], uint32(timeval.Sec))
+	binary.LittleEndian.PutUint32(headerBuff[4:8], uint32(timeval.Usec))
+	binary.LittleEndian.PutUint32(headerBuff[8:12], uint32(writeLen))
+	writeData := append(headerBuff, data...)
+	bw, err := tr.wr.Write(writeData)
 	if err != nil {
 		return -1, err
 	}

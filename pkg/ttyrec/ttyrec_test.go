@@ -3,6 +3,7 @@ package ttyrec
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -42,5 +43,20 @@ func TestTTYRecWriter(t *testing.T) {
 
 	if !(before.Usec <= usec && usec <= after.Usec) {
 		t.Fatalf("Microseconds Mismatch, got %d, wanted between %d and %d\n", usec, before.Usec, after.Usec)
+	}
+}
+
+type jankyWriter struct{}
+
+func (j *jankyWriter) Write(b []byte) (int, error) {
+	return 0, fmt.Errorf("could not write data")
+}
+
+func TestTTYRecWriterJanky(t *testing.T) {
+	jw := &jankyWriter{}
+	rec := NewTTYRecorder(jw)
+	_, err := rec.Write([]byte{0x01, 0x02, 0x03, 0x04})
+	if err == nil || err.Error() != "could not write data" {
+		t.Fatalf("Error Mismatch, got %s, wanted \"could not write data\"", err)
 	}
 }
