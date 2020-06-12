@@ -1,6 +1,9 @@
 # `grterm` - A Terminal Recorder
 A really simple terminal recorder compatible with the ttyrec format written in Go.
 
+![Run Tests](https://github.com/rebeccajae/grterm/workflows/Run%20Tests/badge.svg?branch=default)
+![Build](https://github.com/rebeccajae/grterm/workflows/Build/badge.svg?branch=default)
+
 ## Usage
 You can bring this up by doing `grterm --help`.
 ```
@@ -14,7 +17,8 @@ Usage:
 ```
 
 ## Installation 
-TODO
+Grab a build from the default branch over in the Build action. I try to 
+make sure that the default branch is always prod-ready.
 
 ## Resizability
 Some terminal emulators allow you to configure escape-code driven resizes. 
